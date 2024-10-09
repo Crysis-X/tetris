@@ -54,17 +54,17 @@ export default class Game {
       }
       linesForDeleting.forEach((id) => {
         this.cells[id].forEach((cell) => cell.setStatus(false));
-        for(let i = id - 1; i > -1; i--){
-          let isEmpty = true; 
-          for(let x = 0; x < this.cells[i].length; x++){
-            if(this.cells[i][x].getStatus()){
+        for (let i = id - 1; i > -1; i--) {
+          let isEmpty = true;
+          for (let x = 0; x < this.cells[i].length; x++) {
+            if (this.cells[i][x].getStatus()) {
               isEmpty = false;
               break;
             }
           }
-          if(isEmpty) break;
+          if (isEmpty) break;
           else {
-            this.cells[i].forEach(cell => {
+            this.cells[i].forEach((cell) => {
               this.cells[i + 1][cell.getX()].setStatus(cell.getStatus());
               cell.setStatus(false);
             });
@@ -72,16 +72,15 @@ export default class Game {
         }
         this.point++;
         this.event.updatePoint && this.event.updatePoint(this.point);
-      }
-    );
+      });
     });
   };
   restart = () => {
-    this.cells.forEach(line => line.forEach(cell => cell.setStatus(false)));
+    this.cells.forEach((line) => line.forEach((cell) => cell.setStatus(false)));
     this.start();
     this.point = 0;
     this.event.updatePoint && this.event.updatePoint(this.point);
-  }
+  };
   private build = (height: number, width: number, cellWidth?: string) => {
     const cells: Cell[][] = [];
     for (let y = 0; y < height; y++) {
@@ -97,8 +96,8 @@ export default class Game {
   };
   onGameEnd = (handler: typeof this.event.gameEnd) => {
     this.event.gameEnd = handler;
-  }
+  };
   onUpdatePoint = (handler: typeof this.event.updatePoint) => {
     this.event.updatePoint = handler;
-  }
+  };
 }

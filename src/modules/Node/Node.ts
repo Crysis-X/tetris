@@ -19,7 +19,7 @@ export default class Node {
     else this.pos = { y: 0, x: Math.floor(cells[0].length / 2) };
     let id = Math.floor(Math.random() * 7);
     if (type) id = NodeList[type];
-    switch(id){
+    switch (id) {
       case 0: {
         this.type = "cube";
         break;
@@ -38,112 +38,107 @@ export default class Node {
       }
       case 4: {
         this.type = "thunderLeft";
-        if(!this.cells[this.pos.y - 1]) this.pos.y++;
+        if (!this.cells[this.pos.y - 1]) this.pos.y++;
         break;
       }
       case 5: {
         this.type = "thunderRight";
-        if(!this.cells[this.pos.y - 1]) this.pos.y++;
+        if (!this.cells[this.pos.y - 1]) this.pos.y++;
         break;
       }
       default: {
         this.type = "mountain";
-        if(!this.cells[this.pos.y - 1]) this.pos.y++;
+        if (!this.cells[this.pos.y - 1]) this.pos.y++;
         break;
       }
     }
     const res = generateNode(this.type, this.pos.x, this.pos.y);
-    if(!res[this.type]) throw Error();
+    if (!res[this.type]) throw Error();
     const nodeCells: Cell[] = [];
-    res[this.type]?.forEach(pos => nodeCells.push(this.cells[pos.y][pos.x]));
+    res[this.type]?.forEach((pos) => nodeCells.push(this.cells[pos.y][pos.x]));
     this.nodeCells = nodeCells;
   }
   getType = () => this.type;
   rotate = () => {
-    if(this.type == "cube") return;
+    if (this.type == "cube") return;
     this.remove();
     let newCells: Cell[] = [];
     const res = generateNode(this.type, this.pos.x, this.pos.y);
-    if(this.type == "line" || this.type == "thunderLeft" || this.type == "thunderRight"){
+    if (
+      this.type == "line" ||
+      this.type == "thunderLeft" ||
+      this.type == "thunderRight"
+    ) {
       let canRotate = true;
-      if (this.rotateLevel == 1){
-        if("r1_" + this.type in res){
+      if (this.rotateLevel == 1) {
+        if ("r1_" + this.type in res) {
           res["r1_" + this.type].forEach((pos) => {
-            if(this.cells[pos.y] && this.cells[pos.y][pos.x]){
+            if (this.cells[pos.y] && this.cells[pos.y][pos.x]) {
               newCells.push(this.cells[pos.y][pos.x]);
-            }
-            else canRotate = false;
-          }
-        );
+            } else canRotate = false;
+          });
         }
-      } 
-      else res[this.type]?.forEach((pos) => {
-        if(this.cells[pos.y] && this.cells[pos.y][pos.x]){
-          newCells.push(this.cells[pos.y][pos.x]);
-        }
-        else canRotate = false;
+      } else
+        res[this.type]?.forEach((pos) => {
+          if (this.cells[pos.y] && this.cells[pos.y][pos.x]) {
+            newCells.push(this.cells[pos.y][pos.x]);
+          } else canRotate = false;
+        });
+      if (!canRotate) {
+        this.spawn();
+        return;
       }
-    );
-    if(!canRotate){
-      this.spawn();
-      return;
-    }
       for (let i = 0; i < newCells.length; i++) {
-        if(newCells[i].getStatus()){
+        if (newCells[i].getStatus()) {
           this.spawn();
           return;
         }
       }
       this.rotateLevel = this.rotateLevel == 1 ? 2 : 1;
-    }
-    else if(this.type == "mountain" || this.type == "pistolLeft" || this.type == "pistolRight"){
-      let canRotate = true; 
-      switch(this.rotateLevel){
+    } else if (
+      this.type == "mountain" ||
+      this.type == "pistolLeft" ||
+      this.type == "pistolRight"
+    ) {
+      let canRotate = true;
+      switch (this.rotateLevel) {
         case 1:
           res["r1_" + this.type]?.forEach((pos) => {
-            if(this.cells[pos.y] && this.cells[pos.y][pos.x]){
+            if (this.cells[pos.y] && this.cells[pos.y][pos.x]) {
               newCells.push(this.cells[pos.y][pos.x]);
-            }
-            else canRotate = false;
-          } 
-        );
-          if(!canRotate) break;
+            } else canRotate = false;
+          });
+          if (!canRotate) break;
           this.rotateLevel = 2;
           break;
         case 2:
           res["r2_" + this.type]?.forEach((pos) => {
-            if(this.cells[pos.y] && this.cells[pos.y][pos.x]){
+            if (this.cells[pos.y] && this.cells[pos.y][pos.x]) {
               newCells.push(this.cells[pos.y][pos.x]);
-            }
-            else canRotate = false;
-          } 
-        );
-          if(!canRotate) break;
+            } else canRotate = false;
+          });
+          if (!canRotate) break;
           this.rotateLevel = 3;
           break;
         case 3:
           res["r3_" + this.type]?.forEach((pos) => {
-            if(this.cells[pos.y] && this.cells[pos.y][pos.x]){
+            if (this.cells[pos.y] && this.cells[pos.y][pos.x]) {
               newCells.push(this.cells[pos.y][pos.x]);
-            }
-            else canRotate = false;
-          } 
-        );
-          if(!canRotate) break;
+            } else canRotate = false;
+          });
+          if (!canRotate) break;
           this.rotateLevel = 4;
           break;
-          default:
+        default:
           res[this.type]?.forEach((pos) => {
-            if(this.cells[pos.y] && this.cells[pos.y][pos.x]){
+            if (this.cells[pos.y] && this.cells[pos.y][pos.x]) {
               newCells.push(this.cells[pos.y][pos.x]);
-            }
-            else canRotate = false;
-          } 
-        );
-          if(!canRotate) break;
+            } else canRotate = false;
+          });
+          if (!canRotate) break;
           this.rotateLevel = 1;
-        }
-        if(!canRotate) return;
+      }
+      if (!canRotate) return;
     }
     this.nodeCells = newCells;
     this.spawn();
@@ -211,14 +206,14 @@ export default class Node {
     }, gameSpeed);
   };
   fullDown = () => {
-    while(true){
+    while (true) {
       const status = this.moveTo("down");
-      if(!status) break;
+      if (!status) break;
     }
-    };
+  };
   onNodeStop = (handler: typeof this.event.nodeStop) => {
     this.event.nodeStop = handler;
-  }; 
+  };
   private isNodeCell = (cell: Cell) => {
     let isNodeCell = false;
     for (let i = 0; i < this.nodeCells.length; i++) {
